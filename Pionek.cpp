@@ -67,36 +67,28 @@ void Pionek::sprawdz_Zdarzenia(Event &e)
 	//std::cout << "poz.x " << pozycja.x << "\t poz.y " << pozycja.y << "\n";
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-
-		
+		std::cout << "Klik: " << klikniety << "\n";
+		std::cout << "Najechan: " << najechany << "\n";
 	}
-	if (pozycja.x > (W.x - Kolko.getRadius())&& pozycja.x < (W.x + Kolko.getRadius())&&
+	if (pozycja.x > (W.x - Kolko.getRadius())&& pozycja.x < (W.x + Kolko.getRadius())&&    // Sprawdza czy kusor myszy jest nad pionkiem
 		pozycja.y >(W.y - Kolko.getRadius()) && pozycja.y < (W.y + Kolko.getRadius()))
 	{
-		najechany = true;
-		Kolko.setFillColor(Color(C.r+20, C.g + 20, C.b+20));
+		najechany = true;																	// jesli tak to podswietla go 
+		if(!klikniety) Kolko.setFillColor(Color(C.r+20, C.g + 20, C.b+20));
 	}
-	else
+	else                                                                           // Jezeli kursor jest poza pionkiem
 	{
-		Kolko.setFillColor(C);
-		najechany = false;
+		najechany = false;					
+		if (!klikniety) Kolko.setFillColor(Color(C.r , C.g , C.b));									
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+			Kolko.setFillColor(C);
+			klikniety = false;
+		}
 	}
 	if (najechany && sf::Mouse::isButtonPressed(sf::Mouse::Left))
-	{
-		if (klikniety)
-		{
-			klikniety = 0;
-			Kolko.setFillColor(Color(C.r, C.g, C.b));
-		}
-		else
-		{
-			klikniety = 1;
-			Kolko.setFillColor(Color::Red);
-		} 
-
-		
-		std::cout << "A";
+	{		
+		klikniety = 1;
+		Kolko.setFillColor(Color::Red);	
 	}
-	
-	
 }

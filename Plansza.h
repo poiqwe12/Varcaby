@@ -18,5 +18,18 @@ public:
 	~Plansza();
 	void Show();
 	void Poka_polozenie_pionkow();
+	//////////////////////////////
+	bool ruch_lewy_dol(int x, int y);
+	bool ruch_lewy_gora(int x, int y);
+	bool ruch_prawy_dol(int x, int y);
+	bool ruch_prawy_gora(int x, int y);
+	///////////////////////////////
+	bool bicie_lewy_dol(int x, int y);
+	bool bicie_lewy_gora(int x, int y);
+	bool bicie_prawy_dol(int x, int y);
+	bool bicie_prawy_gora(int x, int y);
+	////////////////////////////////
+	bool mozliwe_ruchy();
+	bool mozliwe_bicie();
 };
 

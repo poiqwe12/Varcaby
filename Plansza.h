@@ -33,6 +33,8 @@ public:
 	////////////////////////////////
 	bool mozliwe_ruchy_czarne();
 	bool mozliwe_ruchy_biale();
+	////////////////////////////////
+	bool sprawdz_bicie(Pionek *wsk,int ile);
 	void Wysteruj_z_logiki();
 	bool mozliwe_bicie();
 };

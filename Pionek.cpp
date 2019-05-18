@@ -56,6 +56,15 @@ void Pionek::set_Rozmiar(float radius)
 {
 	Kolko.setRadius(radius);
 }
+void Pionek::set_klikniety(bool a)
+{
+
+	klikniety = a;
+	if(!klikniety)
+		Kolko.setFillColor(Color(C.r, C.g, C.b));
+	if(klikniety) 
+		Kolko.setFillColor(Color::Red);
+}
 void Pionek::set_Pozycja(float x, float y)
 {
 	Kolko.setPosition(x,y);
@@ -89,6 +98,6 @@ void Pionek::sprawdz_Zdarzenia(Event &e)
 	if (najechany && sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{		
 		klikniety = 1;
-		Kolko.setFillColor(Color::Red);	
+		Kolko.setFillColor(Color::Red);											// Kolor po kliknieciu
 	}
 }

@@ -5,7 +5,8 @@ Plansza::Plansza()
 {
 	int a=ile_bialych=12;
 	int b=ile_czarnych=12;
-	
+	int c = 0;
+
 	Okno.create(VideoMode(840, 840, 32), "Warcaby");	// Utworzenie Okna
 	/* Konfiguracja okna */
 	Okno.setActive(true);
@@ -19,6 +20,7 @@ Plansza::Plansza()
 	{
 		for (int j = 0; j < 8; ++j)
 		{
+			Pol_tab[i][j] = 0;
 			Pole[i][j].setSize(Vector2f(100, 100));
 			if ((i + j) % 2 == 0)
 			{
@@ -87,10 +89,12 @@ Plansza::Plansza()
 			}
 		}
 	}
-
-
-
-
+	/* Tworzenie podswietlen dla mozliwych ruchów ruchów  */
+	for (int i = 0; i < 32; ++i)
+	{
+		tab_Podswietlenia[i].set_Window(&Okno);
+		tab_Podswietlenia[i].set_Kolor(210, 40, 40);
+	}
 	
 	
 }
@@ -165,60 +169,194 @@ bool Plansza::bicie_lewy_dol(int x, int y)
 
 	if (x > 1 && y < 6)
 	{
-		if (Polorzenie_pionków[++y][--x] == jaki_kolor_bijemy && Polorzenie_pionków[y+2][x-2] == '.')
+		if (Polorzenie_pionków[y+1][x-1] == jaki_kolor_bijemy && Polorzenie_pionków[y+2][x-2] == '.')
 			return true;
 	}
 	return false;
 }
 bool Plansza::bicie_lewy_gora(int x, int y)
 {
+	char jaki_kolor_bije = Polorzenie_pionków[y][x];
+	char jaki_kolor_bijemy;
+
+	if (jaki_kolor_bije == 'B')
+		jaki_kolor_bijemy = 'C';
+	if (jaki_kolor_bije == 'C')
+		jaki_kolor_bijemy = 'B';
+	if (x > 1 && y > 1)
+	{
+		if (Polorzenie_pionków[y-1][x-1] == jaki_kolor_bijemy && Polorzenie_pionków[y - 2][x - 2] == '.')
+			return true;
+	}
 	return false;
 }
 bool Plansza::bicie_prawy_dol(int x, int y)
 {
+	char jaki_kolor_bije = Polorzenie_pionków[y][x];
+	char jaki_kolor_bijemy;
+
+	if (jaki_kolor_bije == 'B')
+		jaki_kolor_bijemy = 'C';
+	if (jaki_kolor_bije == 'C')
+		jaki_kolor_bijemy = 'B';
+	if (x < 6 && y < 6)
+	{
+		if (Polorzenie_pionków[y+1][x+1] == jaki_kolor_bijemy && Polorzenie_pionków[y + 2][x + 2] == '.')
+			return true;
+	}
 	return false;
 }
 bool Plansza::bicie_prawy_gora(int x, int y)
-{
+{char jaki_kolor_bije = Polorzenie_pionków[y][x];
+	char jaki_kolor_bijemy;
+
+	if (jaki_kolor_bije == 'B')
+		jaki_kolor_bijemy = 'C';
+	if(jaki_kolor_bije=='C')
+		jaki_kolor_bijemy = 'B';
+	if (y > 1 && x < 6)
+	{
+		if (Polorzenie_pionków[y-1][x+1] == jaki_kolor_bijemy && Polorzenie_pionków[y - 2][x + 2] == '.')
+			return true;
+	}
 	return false;
 }
 
 
 
-bool Plansza::mozliwe_ruchy()
+bool Plansza::mozliwe_ruchy_czarne()
 {
-	for (int i = 0; i < ile_czarnych; ++i)
+	sf::Event e;
+	for (int i = 0; i < ile_czarnych; ++i)									// Lece po wszystkich czarnych pionkach
+	{																		// Sprawdzanie bicia
+		int x = tab_Pionek_1[i].get_pozycja_x();
+		int y = tab_Pionek_1[i].get_pozycja_y();
+		if(bicie_prawy_dol(x, y));
+		if(bicie_lewy_dol(x, y));
+		if(bicie_lewy_gora(x, y));
+		if(bicie_prawy_gora(x, y));
+	
+
+	}
+
+	for (int i = 0; i < ile_czarnych; ++i)									// Lece po wszystkich czarnych pionkach
 	{
-		if (tab_Pionek_1[i].get_klikniety())
+		if (tab_Pionek_1[i].get_klikniety())								// jesli wcisniety
 		{
 			int x = tab_Pionek_1[i].get_pozycja_x();
 			int y = tab_Pionek_1[i].get_pozycja_y();
-			std::cout << "-------------Czarne----------------------------------\n";
-			std::cout << "x:  " << x << "  y:  " << y << "\n";
-			std::cout << "R_prawy dol:  " << ruch_prawy_dol(x, y) << "\n";
-			std::cout << "R_lewy dol:   "<<ruch_lewy_dol(x, y)<<"\n";
-			std::cout << "R_lewy gora:  " << ruch_lewy_gora( x,y) << "\n";
-			std::cout << "R_prawy gora: " << ruch_prawy_gora( x, y) << "\n";
-			std::cout << "----------------------------------------------------\n";
+			
+			if (ruch_prawy_dol(x, y))										// jesli mozliwy ruch ustaw podpowiedz i dodaj do okna
+			{
+				tab_Podswietlenia[0].set_pozycja_x(x + 1);
+				tab_Podswietlenia[0].set_pozycja_y(y + 1);
+				tab_Podswietlenia[0].set_Pozycja(70 + (x + 1) * 100, 70 + ((y + 1) * 100));
+				Okno.draw(tab_Podswietlenia[0].Get());			
+			}
+			if (ruch_lewy_dol(x, y))										// jesli mozliwy ruch ustaw podpowiedz i dodaj do okna
+			{
+				tab_Podswietlenia[1].set_pozycja_x(x - 1);
+				tab_Podswietlenia[1].set_pozycja_y(y + 1);
+				tab_Podswietlenia[1].set_Pozycja(70 + (x - 1) * 100, 70 + ((y + 1) * 100));
+				Okno.draw(tab_Podswietlenia[1].Get());
+			}
+			tab_Podswietlenia[0].sprawdz_Zdarzenia(e);						// Sprawdzam czy podpowiedz jest kliknieta
+			if (tab_Podswietlenia[0].get_klikniety()&& ruch_prawy_dol(x, y))
+			{
+				Polorzenie_pionków[y][x] = '.';								// wykonanie ruchu
+				Polorzenie_pionków[y + 1][x + 1] = 'C';
+				tab_Pionek_1[i].set_klikniety(0);
+				Poka_polozenie_pionkow();
+				return true;
+			}
+			tab_Podswietlenia[1].sprawdz_Zdarzenia(e);
+			if (tab_Podswietlenia[1].get_klikniety()&& ruch_lewy_dol(x, y))
+			{
+				Polorzenie_pionków[y][x] = '.';
+				Polorzenie_pionków[y + 1][x - 1] = 'C';
+				tab_Pionek_1[i].set_klikniety(0);
+				Poka_polozenie_pionkow();
+				return true;
+			}
 		}
 
 	}
-	for (int i = 0; i < ile_bialych; ++i)
+	return false;
+}
+bool Plansza::mozliwe_ruchy_biale()
+{ 
+	sf::Event e;
+	int i;
+	for (i = 0; i < ile_bialych; ++i)
 	{
 		if (tab_Pionek_2[i].get_klikniety())
 		{
 			int x = tab_Pionek_2[i].get_pozycja_x();
 			int y = tab_Pionek_2[i].get_pozycja_y();
-			std::cout << "-------------Bia³e----------------------------------\n";
-			std::cout << "x:  " << x << "  y:  " << y << "\n";
-			std::cout << "R_prawy dol:  " << ruch_prawy_dol(x, y) << "\n";
-			std::cout << "R_lewy dol:   " << ruch_lewy_dol(x, y) << "\n";
-			std::cout << "R_lewy gora:  " << ruch_lewy_gora(x, y) << "\n";
-			std::cout << "R_prawy gora: " << ruch_prawy_gora(x, y) << "\n";
-			std::cout << "----------------------------------------------------\n";
+			
+			if (ruch_prawy_gora(x, y))
+			{
+				tab_Podswietlenia[2].set_pozycja_x(x + 1);
+				tab_Podswietlenia[2].set_pozycja_y(y - 1);
+				tab_Podswietlenia[2].set_Pozycja(70 + (x + 1) * 100, 70 + ((y - 1) * 100));
+				Okno.draw(tab_Podswietlenia[2].Get());
+			}
+			if (ruch_lewy_gora(x, y))
+			{
+				tab_Podswietlenia[3].set_pozycja_x(x - 1);
+				tab_Podswietlenia[3].set_pozycja_y(y - 1);
+				tab_Podswietlenia[3].set_Pozycja(70 + (x - 1) * 100, 70 + ((y - 1) * 100));
+				Okno.draw(tab_Podswietlenia[3].Get());
+			}
+
+			tab_Podswietlenia[2].sprawdz_Zdarzenia(e);
+			if (tab_Podswietlenia[2].get_klikniety() && ruch_prawy_gora(x, y))
+			{
+				Polorzenie_pionków[y][x] = '.';
+				Polorzenie_pionków[y - 1][x + 1] = 'B';
+				tab_Pionek_2[i].set_klikniety(0);
+				Poka_polozenie_pionkow();
+				return true;
+			}
+			tab_Podswietlenia[3].sprawdz_Zdarzenia(e);
+			if (tab_Podswietlenia[3].get_klikniety() && ruch_lewy_gora(x, y))
+			{
+				Polorzenie_pionków[y][x] = '.';
+				Polorzenie_pionków[y - 1][x - 1] = 'B';
+				tab_Pionek_2[i].set_klikniety(0);
+				Poka_polozenie_pionkow();
+				return true;
+			}
+			
+			
+		}	
+	}
+	
+	return false;
+}
+
+void Plansza::Wysteruj_z_logiki()
+{
+	int b = ile_czarnych;
+	int a = ile_bialych;
+	for (int i = 0; i < 8; i++)				//wiadomo	
+	{
+		for (int j = 0; j < 8; j++)			// wiadomo
+		{
+			if (Polorzenie_pionków[i][j] == 'C')	// jezeli pionek czarny
+			{
+				tab_Pionek_1[--a].set_Pozycja(70 + j * 100, 70 + (i * 100));
+				tab_Pionek_1[a].set_pozycja_x(j);
+				tab_Pionek_1[a].set_pozycja_y(i);
+			}
+			if (Polorzenie_pionków[i][j] == 'B')   // jezeli pionek bia³y
+			{
+				tab_Pionek_2[--b].set_Pozycja(70 + j * 100, 70 + (i * 100));
+				tab_Pionek_2[b].set_pozycja_x(j);
+				tab_Pionek_2[b].set_pozycja_y(i);
+			}
 		}
 	}
-	return false;
 }
 
 
@@ -228,29 +366,31 @@ bool Plansza::mozliwe_ruchy()
 
 void Plansza::Show()
 {
+	bool ktopierwszy = 0;
 	Poka_polozenie_pionkow();
 	sf::Event e;
 	int a = 0, b = 0, c = 0;
 	while (Okno.isOpen())
 	{
+		Okno.clear(Color(a, b, c));
+		
+		
 		
 		while (Okno.pollEvent(e))			// koolejka wydarzen, ktore sie zadzia³a³y od ostatniej klatki
 		{
 			if (e.type == sf::Event::Closed || (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)))
 				Okno.close();
-			a++;
-			b++;
-			c++;
-			if (a > 254) {
-				a = b = c = 0;
-			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 			{
-				for (int i = 0; i < ile_bialych; ++i)
-				{
-					mozliwe_ruchy();
+				a++;
+				b++;
+				c++;
+				if (a > 254) {
+					a = b = c = 0;
 				}
 			}
+			
+			
 		}
 		/* Dodawanie do Okna Pol szachownicy */
 		for (int i = 0; i < 8; ++i)
@@ -260,16 +400,23 @@ void Plansza::Show()
 				Okno.draw(Pole[i][j]);
 			}	
 		}
+		if (ktopierwszy)
+		{
+			if(mozliwe_ruchy_biale()) ktopierwszy = 0;
+		}
+		else
+		{
+			if(mozliwe_ruchy_czarne()) ktopierwszy=1;
+		}
 		/* Dodawanie do Okna Pionków */
 		for (int i = 0; i < ile_czarnych; ++i)
 		{
 			Okno.draw(tab_Pionek_1[i].Get());	//Czarne
-
 		}
 		for (int i = 0; i < ile_bialych; ++i)
 		{
 		Okno.draw(tab_Pionek_2[i].Get());	//Bia³e
-		}
+		}	
 		/* Sprawdzanie zdarzen dla Pionków*/
 		for (int i = 0; i < ile_czarnych; ++i)
 		{
@@ -281,7 +428,8 @@ void Plansza::Show()
 		}
 		
 		
+		Wysteruj_z_logiki();
 		Okno.display();	//Wiadomo
-		Okno.clear(Color(a, b, c));
+		
 	}
 }

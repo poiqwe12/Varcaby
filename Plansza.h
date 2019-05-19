@@ -36,6 +36,6 @@ public:
 	////////////////////////////////
 	bool sprawdz_bicie(Pionek *wsk,int ile);
 	void Wysteruj_z_logiki();
-	bool mozliwe_bicie();
+	bool mozliwe_bicie(int x,int y);
 };
 

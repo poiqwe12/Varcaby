@@ -8,6 +8,7 @@ class Pionek
 	Sprite S;					// Moze wykorzystam	
 	CircleShape Kolko;			// wiadomo
 	Color C;
+	bool damka;					// Czy damka ?
 	bool najechany;
 	bool klikniety;
 	int pozycja_x, pozycja_y;
@@ -27,6 +28,8 @@ public:
 	void set_Rozmiar(float radius);
 	void set_klikniety(bool a);
 	void sprawdz_Zdarzenia(Event &e);
+	void set_damka(bool d);
+	bool get_damka();
 	CircleShape& Get()
 	{
 		return Kolko;

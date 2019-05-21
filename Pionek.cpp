@@ -7,10 +7,11 @@ Pionek::Pionek()
 	Kolko.setRadius(40);
 	Kolko.setPointCount(9);
 	
-	Kolko.setOutlineThickness(3);
+	Kolko.setOutlineThickness(4);
 	Kolko.setOrigin(Vector2f(40, 40));
 	najechany = false;
 	klikniety = false;
+	damka = 0;
 	
 }
 
@@ -51,6 +52,7 @@ void Pionek::set_Kolor(int r, int g, int b)
 	C.b = b;
 	Kolko.setFillColor(Color(r, g, b));
 	Kolko.setOutlineColor(Color(255-r, 255-g, 255-b));
+	//Kolko.setOutlineColor(Color::Blue);
 }
 void Pionek::set_Rozmiar(float radius)
 {
@@ -74,6 +76,20 @@ void Pionek::sprawdz_Zdarzenia(Event &e)
 	Vector2i pozycja = sf::Mouse::getPosition(*Okienko);
 	Vector2f W = Kolko.getPosition();
 	//std::cout << "poz.x " << pozycja.x << "\t poz.y " << pozycja.y << "\n";
+	if (damka)
+	{
+		//Kolko.setOutlineThickness(5);
+		Kolko.setOutlineColor(Color::Magenta);
+		//Kolko.setOrigin(Vector2f(30, 30));
+		//Kolko.setPointCount(122);
+		//Kolko.setRadius(30);
+	}
+	else
+	{
+		Kolko.setOutlineColor(Color(255-C.r,255- C.g,255- C.b));
+	}
+	
+	
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
 		std::cout << "Klik: " << klikniety << "\n";
@@ -100,4 +116,14 @@ void Pionek::sprawdz_Zdarzenia(Event &e)
 		klikniety = 1;
 		Kolko.setFillColor(Color::Red);											// Kolor po kliknieciu
 	}
+}
+
+void Pionek::set_damka(bool d)
+{
+	damka = d;
+}
+
+bool Pionek::get_damka()
+{
+	return damka;
 }

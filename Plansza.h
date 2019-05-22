@@ -14,6 +14,11 @@ class Plansza
 	Podswietlenie tab_Podswietlenia[32];		// Podswietlenia prawid³owych ruchów
 	int ile_bialych;
 	int ile_czarnych;
+	////////////////////////////////
+	//MIN MAX
+	int tab_wagi_pionowe[8];
+	int tab_wagi_poziome[8];
+	int waga_bicie, waga_damka;
 	
 public:
 	Plansza();
@@ -37,5 +42,8 @@ public:
 	bool sprawdz_bicie(Pionek *wsk,int ile);
 	void Wysteruj_z_logiki();
 	bool mozliwe_bicie(int x,int y);
+	/////////////////////////////////
+	void minmax(bool czy_czarne,int glebokosc);
+	//int policz_wage(bool czy_czarne, char tab[8][8]);
 };
 

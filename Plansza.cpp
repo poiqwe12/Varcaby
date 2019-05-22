@@ -1,14 +1,19 @@
 #include "Plansza.h"
 #include <iostream>
+#include "Pozycja.h"
+#include <list>
 /* Konstruktor */
 Plansza::Plansza()
 {
+	/* Logika */
+
 	ile_bialych=12;
 	ile_czarnych=12;
 	int b;
 	int a = b = 0;
 	int c = 0;
 
+	/*  Grafika  */
 	Okno.create(VideoMode(840, 840, 32), "Warcaby");	// Utworzenie Okna
 	/* Konfiguracja okna */
 	Okno.setActive(true);
@@ -279,6 +284,65 @@ bool Plansza::mozliwe_bicie(int x, int y)
 	if (bicie_lewy_gora(x, y))  bicie = true;
 	if (bicie_prawy_gora(x, y)) bicie = true;
 	return bicie;
+}
+
+void Plansza::minmax(bool czy_czarne,int glebokosc)
+{
+	std::list<Pozycja> Lista_pozycje;
+	Pozycja P;
+	char tab_minmax[8][8];
+	for (int i = 0; i < 8; ++i)							// Kopiowanie do tablicy pomocniczej
+	{
+		for (int j = 0; j < 8; ++j)
+		{
+			tab_minmax[i][j] = Polorzenie_pionków[i][j];
+		}
+	}
+	
+	//std::cout << "Wynik: " << policz_wage(czy_czarne, tab_minmax)<<"\n";
+	if (czy_czarne)
+	{
+		for (int i = 0; i < glebokosc; ++i)
+		{
+			if (sprawdz_bicie(tab_Pionek_1, ile_czarnych))
+			{
+				for (int k = 0; k < ile_czarnych; k++)
+				{
+					int x = tab_Pionek_1[k].get_pozycja_x();
+					int y = tab_Pionek_1[k].get_pozycja_y();
+					if (mozliwe_bicie(x, y))
+					{
+						if (bicie_lewy_dol(x, y))
+						{
+
+						}
+						if (bicie_lewy_gora(x, y))
+						{
+
+						}
+						if (bicie_prawy_dol(x, y))
+						{
+
+						}
+						if (bicie_prawy_gora(x, y))
+						{
+
+						}
+							
+					}
+				}
+			}
+			for (int j = 0; j < ile_czarnych; ++j)
+			{
+				
+			}
+		}
+	}
+	else
+	{
+
+	}
+
 }
 
 
@@ -721,12 +785,7 @@ void Plansza::Show()
 				Okno.close();
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 			{
-				a++;
-				b++;
-				c++;
-				if (a > 254) {
-					a = b = c = 0;
-				}
+				
 			}		
 		}
 		/* Dodawanie do Okna Pol szachownicy */
@@ -741,7 +800,9 @@ void Plansza::Show()
 		{
 			if (mozliwe_ruchy_biale())
 			{
+			
 				 ktopierwszy = 0;
+				 minmax(0, 1);
 			}
 			Wysteruj_z_logiki();
 		}
@@ -750,6 +811,7 @@ void Plansza::Show()
 			if (mozliwe_ruchy_czarne())
 			{
 				 ktopierwszy = 1;
+				 minmax(1, 1);
 			}
 			Wysteruj_z_logiki();
 		}

@@ -18,7 +18,7 @@ class Plansza
 	//MIN MAX
 	int tab_wagi_pionowe[8];
 	int tab_wagi_poziome[8];
-	int waga_bicie, waga_damka;
+	int waga_pionek, waga_damka,waga_podwojne;
 	bool multi;
 public:
 	Plansza();
@@ -41,7 +41,6 @@ public:
 	void wykonaj_bicie_prawy_dol(char tab[8][8], int x, int y);
 	void wykonaj_bicie_lewy_gora(char tab[8][8], int x, int y);
 	void wykonaj_bicie_prawy_gora(char tab[8][8], int x, int y);
-	////////////////////////////////
 	void wykonaj_ruch_lewy_dol(char tab[8][8], int x, int y);
 	void wykonaj_ruch_prawy_dol(char tab[8][8], int x, int y);
 	void wykonaj_ruch_lewy_gora(char tab[8][8], int x, int y);
@@ -56,8 +55,9 @@ public:
 	void Wysteruj_z_logiki();
 	int mozliwe_bicie(char tab[8][8],int x,int y);
 	/////////////////////////////////
-	bool minmax(bool czy_czarne,int glebokosc);
+	bool minmax(char tablica_minmax[8][8],bool czy_czarne,int glebokosc);
 	int policz_wage(bool czy_czarne, char tab[8][8]);
+	int najlepsza_waga(bool czy_czarne, char tab[8][8]);
 	void kopiowanie_tablicy(char tab[8][8], char tab2[8][8]);
 	/////////////////////////////////////
 

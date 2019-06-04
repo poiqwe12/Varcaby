@@ -6,24 +6,25 @@
 Plansza::Plansza()
 {
 		tab_wagi_pionowe[0] = 1;
-		tab_wagi_pionowe[1] = 3;
-		tab_wagi_pionowe[2] = 5;
-		tab_wagi_pionowe[3] = 8;
-		tab_wagi_pionowe[4] = 10;
-		tab_wagi_pionowe[5] = 12;
-		tab_wagi_pionowe[6] = 14;
-		tab_wagi_pionowe[7] = 20;
+		tab_wagi_pionowe[1] = 1;
+		tab_wagi_pionowe[2] = 1;
+		tab_wagi_pionowe[3] = 1;
+		tab_wagi_pionowe[4] = 1;
+		tab_wagi_pionowe[5] = 1;
+		tab_wagi_pionowe[6] = 1;
+		tab_wagi_pionowe[7] = 1;
 
 		tab_wagi_poziome[0] = 1;
-		tab_wagi_poziome[1] = 2;
-		tab_wagi_poziome[2] = 3;
-		tab_wagi_poziome[3] = 4;
-		tab_wagi_poziome[4] = 4;
-		tab_wagi_poziome[5] = 3;
-		tab_wagi_poziome[6] = 2;
+		tab_wagi_poziome[1] = 1;
+		tab_wagi_poziome[2] = 2;
+		tab_wagi_poziome[3] = 2;
+		tab_wagi_poziome[4] = 2;
+		tab_wagi_poziome[5] = 2;
+		tab_wagi_poziome[6] = 1;
 		tab_wagi_poziome[7] = 1;
 
-		waga_bicie = 20;
+		waga_podwojne = 10;
+		waga_pionek = 8;
 		waga_damka = 35;
 		multi = 0;
 	/* Logika */
@@ -349,17 +350,17 @@ bool Plansza::sprawdz_bicie(char tab[8][8], bool czy_czarne)
 	}
 	return bicie;
 }
-int Plansza::mozliwe_bicie(char tab[8][8],int x, int y)
+int  Plansza::mozliwe_bicie(char tab[8][8],int x, int y)
 {
-	int bicie = 0;
-	if (bicie_prawy_dol(tab,x, y))  ++bicie;
-	if (bicie_lewy_dol(tab,x, y))   ++bicie;
-	if (bicie_lewy_gora(tab,x, y))  ++bicie;
-	if (bicie_prawy_gora(tab,x, y)) ++bicie;
+	bool bicie = 0;
+	if (bicie_prawy_dol(tab,x, y))  bicie=1;
+	if (bicie_lewy_dol(tab,x, y))   bicie=1;
+	if (bicie_lewy_gora(tab,x, y))  bicie=1;
+	if (bicie_prawy_gora(tab,x, y)) bicie=1;
 	return bicie;
 }
 
-int Plansza::policz_wage(bool czy_czarne, char tab[8][8])
+int  Plansza::policz_wage(bool czy_czarne, char tab[8][8])
 {
 	int waga_czarnych = 0;
 	int waga_bialych = 0;
@@ -370,11 +371,11 @@ int Plansza::policz_wage(bool czy_czarne, char tab[8][8])
 			{
 				if (tab[i][j] == 'C')
 				{
-					waga_czarnych = waga_czarnych + tab_wagi_pionowe[i] + tab_wagi_poziome[j];
+					waga_czarnych = waga_czarnych+ waga_pionek + tab_wagi_pionowe[i] + tab_wagi_poziome[j];
 				}
 				if (tab[i][j] == 'B')
 				{
-					waga_bialych = waga_bialych + tab_wagi_pionowe[7 - i] + tab_wagi_poziome[j];
+					waga_bialych = waga_bialych+ waga_pionek+ tab_wagi_pionowe[7 - i] + tab_wagi_poziome[j];
 				}
 				if (tab[i][j] == 'c')
 				{
@@ -395,6 +396,106 @@ int Plansza::policz_wage(bool czy_czarne, char tab[8][8])
 			return waga_bialych;
 		}
 	
+}
+
+int  Plansza::najlepsza_waga(bool czy_czarne, char tab[8][8])
+{
+	int best_waga = 0;
+	char tab_pomoc[8][8];
+	char znak='C';
+	char znak_2='c';
+	if (!czy_czarne)
+	{
+		znak = 'B';
+		znak_2 = 'b';
+	}
+	kopiowanie_tablicy(tab_pomoc, tab);
+	for (int k = 0; k < 8; ++k)
+	{
+		for (int t = 0; t < 8; ++t)
+		{
+			if (!sprawdz_bicie(tab, czy_czarne))
+			{
+				if (tab[k][t] == znak)
+				{
+					if (ruch_lewy_dol(tab, t, k))
+					{
+						wykonaj_ruch_lewy_dol(tab, t, k);
+						if (best_waga < policz_wage(czy_czarne, tab))
+						{
+							best_waga = policz_wage(czy_czarne, tab);
+						}
+						wykonaj_ruch_prawy_gora(tab, t - 1, k + 1);
+					}
+					if (ruch_prawy_dol(tab, t, k))
+					{
+						wykonaj_ruch_prawy_dol(tab, t, k);
+						if (best_waga < policz_wage(czy_czarne, tab))
+						{
+							best_waga = policz_wage(czy_czarne, tab);
+						}
+						wykonaj_ruch_lewy_gora(tab, t + 1, k + 1);
+					}
+				}
+			}
+			else
+			{
+				if (bicie_lewy_dol(tab_pomoc, t, k))
+				{
+					wykonaj_bicie_lewy_dol(tab_pomoc, t, k);
+					if (best_waga < waga_pionek + policz_wage(czy_czarne, tab_pomoc))
+					{
+						best_waga =waga_pionek+ policz_wage(czy_czarne, tab_pomoc) ;
+					}
+					if (mozliwe_bicie(tab_pomoc, t-2, k+2))
+					{
+						best_waga+=najlepsza_waga(czy_czarne, tab_pomoc);
+					}
+					kopiowanie_tablicy(tab_pomoc, tab);
+				}
+				if (bicie_lewy_gora(tab_pomoc, t, k))
+				{
+					wykonaj_bicie_lewy_gora(tab_pomoc, t, k);
+					if (best_waga < waga_pionek + policz_wage(czy_czarne, tab_pomoc))
+					{
+						best_waga = waga_pionek + policz_wage(czy_czarne, tab_pomoc);
+					}
+					if (mozliwe_bicie(tab_pomoc, t-2, k-2))
+					{
+						best_waga += najlepsza_waga(czy_czarne, tab_pomoc);
+					}
+					kopiowanie_tablicy(tab_pomoc, tab);
+				}
+				if (bicie_prawy_dol(tab_pomoc, t, k))
+				{
+					wykonaj_bicie_prawy_dol(tab_pomoc, t, k);
+					if (best_waga < waga_pionek + policz_wage(czy_czarne, tab_pomoc))
+					{
+						best_waga = waga_pionek + policz_wage(czy_czarne, tab_pomoc);
+					}
+					if (mozliwe_bicie(tab_pomoc, t+2, k+2))
+					{
+						best_waga += najlepsza_waga(0, tab_pomoc);
+					}
+					kopiowanie_tablicy(tab_pomoc, tab);
+				}
+				if (bicie_prawy_gora(tab_pomoc, t, k))
+				{
+					wykonaj_bicie_prawy_gora(tab_pomoc, t, k);
+					if (best_waga < waga_pionek + policz_wage(czy_czarne, tab_pomoc))
+					{
+						best_waga = waga_pionek + policz_wage(czy_czarne, tab_pomoc);
+					}
+					if (mozliwe_bicie(tab_pomoc, t+2, k-2))
+					{
+						best_waga += najlepsza_waga(czy_czarne, tab_pomoc);
+					}
+					kopiowanie_tablicy(tab_pomoc, tab);
+				}
+			}
+		}
+	}
+	return best_waga;
 }
 
 void Plansza::kopiowanie_tablicy(char tab[8][8], char tab2[8][8])
@@ -436,6 +537,7 @@ void Plansza::wykonaj_bicie_prawy_gora(char tab[8][8], int x, int y)
 	tab[y - 1][x + 1] = '.';
 	tab[y - 2][x + 2] = zm;
 }
+
 void Plansza::wykonaj_ruch_lewy_dol(char tab[8][8], int x, int y)
 {
 	char zm = tab[y][x];
@@ -460,68 +562,151 @@ void Plansza::wykonaj_ruch_prawy_gora(char tab[8][8], int x, int y)
 	tab[y][x] = '.';
 	tab[y - 1][x + 1] = zm;
 }
-bool Plansza::minmax(bool czy_czarne,int glebokosc)
+bool Plansza::minmax(char tablica_minmax[8][8], bool bicie_2, int glebokosc)
 {
-	char tab_minmax[8][8];
 	char best_minmax[8][8];
-	char best[8][8];
-	int waga_b,waga_c;
+	char tab_minmax[8][8];
 	int best_waga = -100000;
-	bool bicie = false;
+	int podwojne_bicie = 0;
 	for (int i = 0; i < 8; ++i)							// Kopiowanie do tablicy pomocniczej
 	{													// ruch czarncy hpotem bia³ych
 		for (int j = 0; j < 8; ++j)
 		{
-			tab_minmax[i][j] = Polorzenie_pionków[i][j];
-			
+			tab_minmax[i][j] = tablica_minmax[i][j];
 		}
 	}
+
 	
-	if(czy_czarne)
+	for (int k = 0; k < 8; ++k)
 	{
-		for (int i = 0; i < glebokosc; ++i)	// G³ebokosc minmaxa
+		for (int t = 0; t < 8; ++t)
 		{
-			for (int k = 0; k < 8; ++k)
+			if (tab_minmax[k][t] == 'C')
 			{
-				for (int t = 0; t < 8; ++t)
-				{	
-					bicie = 0;
-					if (tab_minmax[k][t] == 'C')
+				
+				if (!sprawdz_bicie(tab_minmax, 1))
+				{
+					if (ruch_lewy_dol(tab_minmax, t, k))
 					{
-						if (ruch_lewy_dol(tab_minmax,t,k))
+						wykonaj_ruch_lewy_dol(tab_minmax, t, k);
+						if (best_waga < policz_wage(1, tab_minmax) - najlepsza_waga(0, tab_minmax))
 						{
-							wykonaj_ruch_lewy_dol(tab_minmax, t, k);
-							if (best_waga < policz_wage(1, tab_minmax))
-							{
-								best_waga = policz_wage(1, tab_minmax);
-								kopiowanie_tablicy(best_minmax, tab_minmax);
-							}
-							
-							wykonaj_ruch_prawy_gora(tab_minmax, t-1, k+1);
+							best_waga = policz_wage(1, tab_minmax) - najlepsza_waga(0, tab_minmax);
+							kopiowanie_tablicy(best_minmax, tab_minmax);
 						}
-						if (ruch_prawy_dol(tab_minmax, t, k))
-						{
-							wykonaj_ruch_prawy_dol(tab_minmax, t, k);
-							if (best_waga < policz_wage(1, tab_minmax))
-							{
-								best_waga = policz_wage(1, tab_minmax) ;
-								kopiowanie_tablicy(best_minmax, tab_minmax);
-							}
-							
-							wykonaj_ruch_lewy_gora(tab_minmax, t + 1, k + 1);
-						}	
+						wykonaj_ruch_prawy_gora(tab_minmax, t - 1, k + 1);
 					}
+					if (ruch_prawy_dol(tab_minmax, t, k))
+					{
+						wykonaj_ruch_prawy_dol(tab_minmax, t, k);
+						if (best_waga < policz_wage(1, tab_minmax) - najlepsza_waga(0, tab_minmax))
+						{
+							best_waga = policz_wage(1, tab_minmax) - najlepsza_waga(0, tab_minmax);
+							kopiowanie_tablicy(best_minmax, tab_minmax);
+						}
+
+						wykonaj_ruch_lewy_gora(tab_minmax, t + 1, k + 1);
+					}
+				}
+				else
+				{
+					podwojne_bicie = 0;
+					if (bicie_lewy_dol(tab_minmax, t, k))
+					{
+						wykonaj_bicie_lewy_dol(tab_minmax, t, k);
+						if (mozliwe_bicie(tab_minmax, t-2, k+2))
+						{
+							podwojne_bicie = waga_podwojne;
+						}
+						//Poka_tablice(tab_minmax);
+						if (best_waga < podwojne_bicie + policz_wage(1, tab_minmax) - najlepsza_waga(0, tab_minmax))
+						{
+							best_waga = podwojne_bicie + policz_wage(1, tab_minmax) -najlepsza_waga(0, tab_minmax);
+							kopiowanie_tablicy(best_minmax, tab_minmax);
+						}
+						if (podwojne_bicie)
+						{
+							std::cout << "aaaaaaaaaaaaaaaaaaaaaaaa";
+							minmax(tab_minmax, 1, 1);
+							return best_waga;
+						}
+						kopiowanie_tablicy(tab_minmax, tablica_minmax);
+					}
+					podwojne_bicie = 0;
+					if (bicie_lewy_gora(tab_minmax, t, k))
+					{
+						wykonaj_bicie_lewy_gora(tab_minmax, t, k);
+						if (mozliwe_bicie(tab_minmax, t-2, k-2))
+						{
+							podwojne_bicie = waga_podwojne;
+						}
+						//Poka_tablice(tab_minmax);
+						if (best_waga < podwojne_bicie + policz_wage(1, tab_minmax)  -najlepsza_waga(0, tab_minmax))
+						{
+							best_waga = podwojne_bicie + policz_wage(1, tab_minmax)  -najlepsza_waga(0, tab_minmax);
+							kopiowanie_tablicy(best_minmax, tab_minmax);
+						}
+						if (podwojne_bicie)
+						{
+							std::cout << "aaaaaaaaaaaaaaaaaaaaaaaa";
+							minmax(tab_minmax, 1, 1);
+							return best_waga;
+						}
+						kopiowanie_tablicy(tab_minmax, tablica_minmax);
+					}
+					podwojne_bicie = 0;
+					if (bicie_prawy_dol(tab_minmax, t, k))
+					{
+						wykonaj_bicie_prawy_dol(tab_minmax, t, k);
+						if (mozliwe_bicie(tab_minmax, t+2, k+2))
+						{
+							podwojne_bicie = waga_podwojne;
+						}
+						//Poka_tablice(tab_minmax);
+						if (best_waga < podwojne_bicie + policz_wage(1, tab_minmax) -najlepsza_waga(0, tab_minmax))
+						{
+							best_waga = podwojne_bicie + policz_wage(1, tab_minmax) - najlepsza_waga(0, tab_minmax);
+							kopiowanie_tablicy(best_minmax, tab_minmax);
+						}
+						if (podwojne_bicie)
+						{
+							std::cout << "aaaaaaaaaaaaaaaaaaaaaaaa";
+							minmax(tab_minmax, 1, 1);
+							return best_waga;
+						}
+						kopiowanie_tablicy(tab_minmax, tablica_minmax);
+					}
+					podwojne_bicie = 0;
+					if (bicie_prawy_gora(tab_minmax, t, k))
+					{
+						wykonaj_bicie_prawy_gora(tab_minmax, t, k);
+						if (mozliwe_bicie(tab_minmax,t+2,k-2))
+						{
+							podwojne_bicie = waga_podwojne;
+						}
+						//Poka_tablice(tab_minmax);
+						if (best_waga < podwojne_bicie + policz_wage(1, tab_minmax) - najlepsza_waga(0, tab_minmax))
+						{
+							best_waga = podwojne_bicie + policz_wage(1, tab_minmax) - najlepsza_waga(0, tab_minmax);
+							kopiowanie_tablicy(best_minmax, tab_minmax);
+						}
+						if (podwojne_bicie)
+						{
+							std::cout << "aaaaaaaaaaaaaaaaaaaaaaaa";
+							minmax(tab_minmax, 1, 1);
+							return best_waga;
+						}
+						kopiowanie_tablicy(tab_minmax, tablica_minmax);
+					}
+
 				}
 			}
 		}
-		Poka_tablice(best_minmax);
-		kopiowanie_tablicy(Polorzenie_pionków,best_minmax);
 	}
-	else
-	{
-
-	}
-	return true;
+		
+	Poka_tablice(best_minmax);
+	kopiowanie_tablicy(Polorzenie_pionków, best_minmax);
+	return best_waga;
 }
 
 
@@ -906,6 +1091,26 @@ void Plansza::Wysteruj_z_logiki()
 {
 	int b = 0;
 	int a = 0;
+	int c = 0;
+	int d = 0;
+	for (int i = 0; i < 8; i++)				//wiadomo	
+	{
+		for (int j = 0; j < 8; j++)			// wiadomo
+		{
+			if (Polorzenie_pionków[i][j] == 'C' || Polorzenie_pionków[i][j] == 'c') ++c;
+			if (Polorzenie_pionków[i][j] == 'B' || Polorzenie_pionków[i][j] == 'b') ++d;
+		}
+	}
+	ile_bialych = d;
+	ile_czarnych = c;
+	for (int i = 0; i < ile_czarnych; ++i)
+	{
+		tab_Pionek_1[a].set_damka(0);
+	}
+	for (int i = 0; i < ile_bialych; ++i)
+	{
+		tab_Pionek_2[a].set_damka(0);
+	}
 	for (int i = 0; i < 8; i++)				//wiadomo	
 	{
 		for (int j = 0; j < 8; j++)			// wiadomo
@@ -981,11 +1186,9 @@ void Plansza::Show()
 		{
 			if (mozliwe_ruchy_biale())
 			{
-				
 				 ktopierwszy = 0;
 			}
-			Wysteruj_z_logiki();
-			
+			Wysteruj_z_logiki();		
 		}
 		else
 		{
@@ -995,7 +1198,7 @@ void Plansza::Show()
 			}
 			if (!multi)
 			{
-				minmax(1, 1);
+				minmax(Polorzenie_pionków, 0, 1);
 				ktopierwszy = 1;
 			}
 
@@ -1029,7 +1232,7 @@ void Plansza::Show()
 
 /*
 
-
+std::cout<<"aaaaaaaaaaaaaaaaaaaaaaaa";
 if (tab_minmax[k][t] == 'C' || tab_minmax[k][t] == 'c')
 					{
 						while (mozliwe_bicie(tab_minmax, t, k))
